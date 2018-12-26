@@ -1,0 +1,213 @@
+(ns reporting_eg.webdriver
+  (:require [etaoin.keys :as k]
+            [clojure.test :refer :all]
+            [etaoin.api :refer :all]
+            [clojure.string :as str]
+            [clojure.java.io :as io]))
+
+(use 'etaoin.api)
+(comment
+  (def driver-opts)
+  (def driver (chrome {:path-driver "e://app//eclipse//temp//chromedriver.exe" :download-dir "e://app//eclipse//temp"}))
+  (def driver (chrome {:path-driver "e://app//eclipse//temp//chromedriver.exe"}))
+  (def driver (chrome {:download-dir "/Users/ivan/Desktop"}))
+  (def driver (chrome {:headless true})) ;; runs headless Chrome
+  (def driver (chrome {:path-driver "e://app//eclipse//temp//chromedriver.exe" :download-dir "/temp"}))
+
+  (def driver (chrome))
+  (headless? driver) ;; true
+
+  ;; let's perform a quick Wiki session
+  (go driver "https://en.wikipedia.org/")
+  (wait-visible driver [{:id :simpleSearch} {:tag :input :name :search}])
+
+  ;; search for something
+  (fill driver {:tag :input :name :search} "Clojure programming language")
+  (fill driver {:tag :input :name :search} k/enter)
+  (wait-visible driver {:class :mw-search-results})
+
+  ;; I'm sure the first link is what I was looking for
+  (click driver [{:class :mw-search-results} {:class :mw-search-result-heading} {:tag :a}])
+  (wait-visible driver {:id :firstHeading})
+
+  ;; let's ensure
+  (get-url driver) ;; "https://en.wikipedia.org/wiki/Clojure"
+
+  (get-title driver) ;; "Clojure - Wikipedia"
+
+  (has-text? driver "Clojure") ;; true
+
+  ;; navigate on history
+  (back driver)
+  (forward driver)
+  (refresh driver)
+  (get-title driver)
+
+  ;; stops Firefox and HTTP server
+  (quit driver)
+
+  (def driver (chrome {:path-driver "e://app//eclipse//temp//chromedriver.exe" :headless true}))
+  (def driver (chrome {:path-driver "e://app//eclipse//temp//chromedriver.exe"
+                       :capabilities {:chromeOptions
+                                      {:args ["--disable-gpu --ignore-certificate-errors --verbose"]}}
+                       }))
+
+  (def driver (chrome {:path-driver "e://app//eclipse//temp//chromedriver.exe"
+                       :download-dir "e:\\app\\temp"
+                       :capabilities {:chromeOptions
+                                      {:args ["--disable-gpu --ignore-certificate-errors"]}}
+                       }))
+
+  (def driver (chrome {:path-driver "e://app//eclipse//temp//chromedriver.exe"
+                       :download-dir "e:\\app\\temp"
+                       :capabilities {:chromeOptions
+                                      {:args ["--headless --disable-gpu --ignore-certificate-errors"]}}}))
+
+  (def driver-opts {:path-driver "e://app//eclipse//temp//chromedriver.exe"
+                    :download-dir "e:\\app\\temp"
+                    :size [1920 780]
+                    :capabilities {:chromeOptions
+                                   {:args ["--disable-gpu --ignore-certificate-errors"]}}})
+
+  (def driver (chrome {:path-driver "e://app//eclipse//temp//chromedriver.exe"
+                       :headless true}))
+
+  (go driver "http://localhost:3000")
+  (click driver [{:tag :li :index 2} {:tag :a}])
+  (click driver [{:tag :li :index 1} {:tag :a}])
+  (wait driver 7)
+  (click-visible driver [{:tag :li :index 1} {:tag :a}])
+  (has-text? driver "List Report")
+  (has-text? driver "Table Report")
+  (quit driver)
+
+
+  (with-chrome driver-opts driver
+    (with-wait 3
+      (go driver "http://localhost:3000")
+      (click driver [{:tag :li :index 2} {:tag :a}])
+      (click driver [{:tag :li :index 1} {:tag :a}])
+      (has-text? driver "List Report")))
+
+  (with-chrome nil driver
+    (go driver "http://localhost:3000"))
+
+  (def download-directory "e:\\app\\temp")
+
+  (def el (query driver [{:tag :li :index 2} {:tag :a}]))
+
+
+  (go driver "http://localhost:3000/list")
+  (go driver "http://localhost:3000/table")
+  (quit driver)
+
+  (def driver-opts {:path-driver "e://app//eclipse//temp//chromedriver.exe"
+                    :download-dir "e:\\app\\temp"
+                    :capabilities {:chromeOptions
+                                   {:args ["--disable-gpu --ignore-certificate-errors"]}}
+                    })
+
+  (defn pdf? [file]
+    (-> file
+        .getAbsolutePath
+        (str/ends-with? ".pdf")))
+
+  (let [files (file-seq (io/file download-directory))
+        found (some pdf? files)]
+    (is found (format "No *.pdf file found in %s directory." download-directory)))
+
+  (let [download-directory "e:\\app\\temp"
+        driver-opts {:path-driver "e://app//eclipse//temp//chromedriver.exe"
+                     :download-dir "e:\\app\\temp"
+                     :capabilities {:chromeOptions
+                                    {:args ["--disable-gpu --ignore-certificate-errors"]}}
+                     }]
+    (with-chrome-headless driver-opts driver
+      (with-wait 3
+        (execute {:driver driver
+                  :method :post
+                  :path [:session (:session @driver) "chromium/send_command"]
+                  :data {:cmd "Page.setDownloadBehavior"
+                         :params {:behavior "allow"
+                                  :downloadPath download-directory}}})
+        (go driver "http://localhost:3000/")
+        (screenshot driver "e:\\app\\temp\\screen.png")
+        (go driver "http://localhost:3000/list")
+        (headless? driver))))
+
+  (let [download-directory "e:\\app\\temp"
+        driver-opts {:path-driver "e://app//eclipse//temp//chromedriver.exe"
+                     :download-dir "e:\\app\\temp"
+                     :capabilities {:chromeOptions
+                                    {:args ["--disable-gpu --ignore-certificate-errors"]}}
+                     }]
+    (with-chrome driver-opts driver
+      (with-wait 3
+        (execute {:driver driver
+                  :method :post
+                  :path [:session (:session @driver) "chromium/send_command"]
+                  :data {:cmd "Page.setDownloadBehavior"
+                         :params {:behavior "allow"
+                                  :downloadPath download-directory}}})
+        (go driver (str "file://e:\\app\\eclipse\\projects\\chrome-reports-1\\" "index.html"))
+        (screenshot driver "e:\\app\\temp\\screen.png")
+        (click driver {:id "download"})
+        ;; (go driver "http://localhost:3000/list")
+        (headless? driver))))
+
+  (let [download-directory "e:\\app\\temp"
+        driver-opts {:path-driver "e://app//eclipse//temp//chromedriver.exe"
+                     :download-dir "e:\\app\\temp"
+                     :capabilities {:chromeOptions
+                                    {:args ["--disable-gpu --ignore-certificate-errors"]}}
+                     }]
+    (with-chrome driver-opts driver
+      (with-wait 3
+        (go driver "http://dusd1devrhap042/public/welcome")
+        (click driver {:tag :button :fn/text "Sign In"})
+        (headless? driver))))
+
+
+
+  (go driver "http://dusd1devrhap042/public/welcome")
+  (click driver {:tag :button :fn/text "Sign In"})
+  (def input-text-elements (query-all driver {:tag :input :type :text}))
+  (def input-password-elements (query-all driver {:tag :input :type :password}))
+  (fill-el driver (first input-text-elements) "arajwani@cls-bank.com")
+  (fill-el driver (first input-password-elements) "Test$1234")
+  (click driver {:tag :input :value "Sign In"})
+
+  (click-el driver (nth (query-all driver {:tag :button}) 0))
+  (click-el driver (nth (query-all driver {:tag :button}) 1))
+  (back driver)
+
+
+  (click driver {:tag :button :index 1})
+  (nth (query-all driver {:tag :button}) 0)
+  (click driver {:tag :div :class "app-selection-menu-button"})
+
+  (query driver {:tag :button})
+
+
+  (fill-el driver ((next elements) "Test$1234"))
+
+
+  (click driver :download)
+  (click driver {:tag :button :fn/text "Download PDF"})
+  (query driver {:tag :button :fn/text "Download PDF"})
+
+
+  (execute {:driver driver
+            :method :post
+            :path [:session (:session @driver) "chromium/send_command"]
+            :data {:cmd  "Page.setDownloadBehavior"
+                   :params {:behavior     "allow"
+                            :downloadPath download-directory}}
+            })
+
+  (screenshot driver "page.png")
+  (js-execute driver "alert(1)")
+  (screenshot driver (java.io.File. "test-native.png"))
+
+  )
+
