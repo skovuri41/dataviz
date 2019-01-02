@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <script src="https://cdn.jsdelivr.net/npm/vega@4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@3.0.0-rc8"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@3"></script>
+</head>
+
+<body>
+  <div id="vis"></div>
+
+  <script>
+    var svgFileName = "test.svg";
+    var spec = {
+      "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
+      "data": { "values": [{"year":1850,"age":0,"sex":1,"people":1483789},
+{"year":1990,"age":25,"sex":2,"people":10587292},
+{"year":1990,"age":30,"sex":1,"people":11028712},
+{"year":1990,"age":30,"sex":2,"people":11105750},
+{"year":1990,"age":35,"sex":1,"people":9853933},
+{"year":1990,"age":35,"sex":2,"people":10038644},
+{"year":1990,"age":40,"sex":1,"people":8712632},
+{"year":1990,"age":40,"sex":2,"people":8928252},
+{"year":1990,"age":45,"sex":1,"people":6848082},
+{"year":1990,"age":45,"sex":2,"people":7115129},
+{"year":1990,"age":50,"sex":1,"people":5553992},
+{"year":1990,"age":50,"sex":2,"people":5899925},
+{"year":1990,"age":55,"sex":1,"people":4981670},
+{"year":1990,"age":55,"sex":2,"people":5460506},
+{"year":1990,"age":60,"sex":1,"people":4953822},
+{"year":1990,"age":60,"sex":2,"people":5663205},
+{"year":1990,"age":65,"sex":1,"people":4538398},
+{"year":1990,"age":65,"sex":2,"people":5594108},
+{"year":1990,"age":70,"sex":1,"people":3429420},
+{"year":1990,"age":70,"sex":2,"people":4610222},
+{"year":1990,"age":75,"sex":1,"people":2344932},
+{"year":1990,"age":75,"sex":2,"people":3723980},
+{"year":1990,"age":80,"sex":1,"people":1342996},
+{"year":1990,"age":80,"sex":2,"people":2545730},
+{"year":1990,"age":85,"sex":1,"people":588790},
+{"year":1990,"age":85,"sex":2,"people":1419494},
+{"year":1990,"age":90,"sex":1,"people":238459},
+{"year":1990,"age":90,"sex":2,"people":745146},
+{"year":2000,"age":0,"sex":1,"people":9735380},
+{"year":2000,"age":0,"sex":2,"people":9310714},
+{"year":2000,"age":5,"sex":1,"people":10552146},
+{"year":2000,"age":5,"sex":2,"people":10069564},
+{"year":2000,"age":10,"sex":1,"people":10563233},
+{"year":2000,"age":10,"sex":2,"people":10022524},
+{"year":2000,"age":15,"sex":1,"people":10237419},
+{"year":2000,"age":15,"sex":2,"people":9692669},
+{"year":2000,"age":20,"sex":1,"people":9731315},
+{"year":2000,"age":20,"sex":2,"people":9324244},
+{"year":2000,"age":25,"sex":1,"people":9659493},
+{"year":2000,"age":25,"sex":2,"people":9518507},
+{"year":2000,"age":30,"sex":1,"people":10205879},
+{"year":2000,"age":30,"sex":2,"people":10119296},
+{"year":2000,"age":35,"sex":1,"people":11475182},
+{"year":2000,"age":35,"sex":2,"people":11635647},
+{"year":2000,"age":40,"sex":1,"people":11320252},
+{"year":2000,"age":40,"sex":2,"people":11488578},
+{"year":2000,"age":45,"sex":1,"people":9925006},
+{"year":2000,"age":45,"sex":2,"people":10261253},
+{"year":2000,"age":50,"sex":1,"people":8507934},
+{"year":2000,"age":50,"sex":2,"people":8911133},
+{"year":2000,"age":55,"sex":1,"people":6459082},
+{"year":2000,"age":55,"sex":2,"people":6921268},
+{"year":2000,"age":60,"sex":1,"people":5123399},
+{"year":2000,"age":60,"sex":2,"people":5668961},
+{"year":2000,"age":65,"sex":1,"people":4453623},
+{"year":2000,"age":65,"sex":2,"people":4804784},
+{"year":2000,"age":70,"sex":1,"people":3792145},
+{"year":2000,"age":70,"sex":2,"people":5184855},
+{"year":2000,"age":75,"sex":1,"people":2912655},
+{"year":2000,"age":75,"sex":2,"people":4355644},
+{"year":2000,"age":80,"sex":1,"people":1902638},
+{"year":2000,"age":80,"sex":2,"people":3221898},
+{"year":2000,"age":85,"sex":1,"people":970357},
+{"year":2000,"age":85,"sex":2,"people":1981156},
+{"year":2000,"age":90,"sex":1,"people":336303},
+{"year":2000,"age":90,"sex":2,"people":1064581}]},
+      "transform": [
+        {"filter": "datum.year == 2000"},
+        {"calculate": "datum.sex == 2 ? 'Female' : 'Male'", "as": "gender"}
+      ],
+      "mark": "bar",
+      "encoding": {
+        "column": {
+          "field": "age", "type": "ordinal"
+        },
+        "y": {
+          "aggregate": "sum", "field": "people", "type": "quantitative",
+          "axis": {"title": "population", "grid": false}
+        },
+        "x": {
+          "field": "gender", "type": "nominal",
+          "scale": {"rangeStep": 12},
+          "axis": {"title": ""}
+        },
+        "color": {
+          "field": "gender", "type": "nominal",
+          "scale": {"range": ["#EA98D2", "#659CCA"]}
+        }
+      },
+      "config": {
+        "view": {"stroke": "transparent"},
+        "axis": {"domainWidth": 1}
+      }
+    };
+
+    function saveSvg(svgEl, name) {
+      var svgBlob = new Blob([svgEl], {type:"image/svg+xml;charset=utf-8"});
+      var svgUrl = URL.createObjectURL(svgBlob);
+      var downloadLink = document.createElement("a");
+      downloadLink.href = svgUrl;
+      downloadLink.download = name;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+    };
+
+  vegaEmbed('#vis', spec, {defaultStyle: true})
+  .then(function(result) {
+    result.view.toSVG()
+      .then(function(svg) {
+        saveSvg(svg, svgFileName)
+      })}).catch(console.warn);
+
+      </script>
+</body>
