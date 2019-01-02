@@ -36,12 +36,14 @@
                  [ring/ring-core "1.7.1"]
                  [ring/ring-defaults "0.3.2"]
                  [selmer "1.12.5"]
+                 [cli-matic "0.3.3"]
                  [com.openhtmltopdf/openhtmltopdf-core "0.0.1-RC17"]
                  [com.openhtmltopdf/openhtmltopdf-pdfbox "0.0.1-RC17"]
                  [com.openhtmltopdf/openhtmltopdf-rtl-support "0.0.1-RC17"]
                  [com.openhtmltopdf/openhtmltopdf-svg-support "0.0.1-RC17"]
-                 [org.jsoup/jsoup "1.11.3"]
-                 [commons-io/commons-io "2.6"]]
+                 ;; [org.jsoup/jsoup "1.11.3"]
+                 ;; [commons-io/commons-io "2.6"]
+                 [clj-htmltopdf "0.1-alpha6"]]
 
   :min-lein-version "2.0.0"
   
