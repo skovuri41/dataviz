@@ -17,7 +17,7 @@
     (pdf/html-to-pdf in report-name)))
 
 (defn js-to-pdf
-  "Generate pdf by execution the js code in headless chrome"
+  "Generate pdf by executing the js code in headless chrome"
   [opts]
   (log/info "Generating Pdf by loading Html JS file in Headless chrome")
   (browser/load-html-file opts))

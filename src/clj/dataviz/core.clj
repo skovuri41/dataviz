@@ -26,12 +26,13 @@
 (defn -main [& args]
   (mount/start #'dataviz.config/env)
   (log/info "Starting Dataviz app")
-  (start-app args)
+  ;; (start-app args)
 
   ;; (report/html-to-pdf (select-keys env [:chrome :html-report-file :pdf-report-name]))
 
   (let [chrome-options (get env :chrome)
         download-dir (select-keys chrome-options [:download-dir])
         driver-opts (select-keys chrome-options [:driver-opts])
+        driver-wait-time (select-keys chrome-options [:driver-wait-time])
         html-js-file (select-keys env [:html-js-file])]
-    (report/js-to-pdf (merge download-dir driver-opts html-js-file))))
+    (report/js-to-pdf (merge download-dir driver-opts html-js-file driver-wait-time))))

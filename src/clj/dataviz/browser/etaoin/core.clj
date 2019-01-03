@@ -27,9 +27,10 @@
   [opts]
   (let [download-dir (get opts :download-dir)
         driver-opts (get opts :driver-opts)
-        html-js-file (get opts :html-js-file)]
+        html-js-file (get opts :html-js-file)
+        driver-wait-time (get opts :driver-wait-time)]
     (with-chrome driver-opts driver
-      (with-wait 1
+      (with-wait driver-wait-time
         (execute {:driver driver
                   :method :post
                   :path [:session (:session @driver) "chromium/send_command"]
