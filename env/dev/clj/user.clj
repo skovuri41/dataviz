@@ -3,9 +3,7 @@
             [clojure.spec.alpha :as s]
             [expound.alpha :as expound]
             [mount.core :as mount]
-            [dataviz.core :refer [start-app]]
-            [conman.core :as conman]
-            [luminus-migrations.core :as migrations]))
+            [dataviz.core :refer [start-app]]))
 
 (alter-var-root #'s/*explain-out* (constantly expound/printer))
 
